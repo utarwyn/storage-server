@@ -14,11 +14,18 @@ import (
 
 func handleReq(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// forward to https if still using http
 		if r.Header.Get("X-Forwarded-Proto") == "http" {
 			http.Redirect(w, r, "https://"+r.Host+r.RequestURI, http.StatusMovedPermanently)
 			if enableLogging {
 				log.Println(301, r.Method, r.URL.Path)
 			}
+			return
+		}
+
+		// do not display directory listings
+		if strings.HasSuffix(r.URL.Path, "/") {
+			http.NotFound(w, r)
 			return
 		}
 
