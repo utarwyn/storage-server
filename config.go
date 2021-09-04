@@ -17,6 +17,7 @@ var (
 	pathPrefix    = "/"
 	clientSecret  = ""
 	enableLogging = false
+	cacheDirList  []string
 	exposeDirList []string
 )
 
@@ -44,13 +45,17 @@ func LookupEnvOrBool(key string, defaultVal bool) bool {
 }
 
 func Configure() {
+	var cacheDirString string
 	var exposeDirString string
+
 	flag.IntVar(&portPtr, "port", LookupEnvOrInt("PORT", portPtr), "listening port")
 	flag.StringVar(&basePath, "base-path", LookupEnvOrString("BASE_PATH", basePath), "directory where all files are stored")
 	flag.StringVar(&clientSecret, "client-secret", LookupEnvOrString("CLIENT_SECRET", clientSecret), "secret key usable to access privileged routes")
 	flag.BoolVar(&enableLogging, "enable-logging", LookupEnvOrBool("ENABLE_LOGGING", enableLogging), "enable log request")
+	flag.StringVar(&cacheDirString, "caching-directories", LookupEnvOrString("CACHING_DIRECTORIES", ""), "list of directories to cache")
 	flag.StringVar(&exposeDirString, "expose-directories", LookupEnvOrString("EXPOSE_DIRECTORIES", ""), "list of directories to expose")
 	flag.Parse()
 
+	cacheDirList = strings.Split(cacheDirString, ";")
 	exposeDirList = strings.Split(exposeDirString, ";")
 }

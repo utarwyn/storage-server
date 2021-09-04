@@ -52,6 +52,7 @@ func main() {
 	handler = UploadMiddleware(handler)
 	handler = DeleteMiddleware(handler)
 	handler = ExposeMiddleware(handler)
+	handler = CachingMiddleware(handler)
 	handler = GzipMiddleware(handler)
 
 	// Start the server
