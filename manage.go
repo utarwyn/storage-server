@@ -17,6 +17,12 @@ func UploadMiddleware(next http.Handler) http.Handler {
 		if r.Method == http.MethodPut && !strings.HasSuffix(r.URL.Path, "/") {
 			LogRequest(r)
 
+			// Check for authorization
+			if !IsAuthorized(r) {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+
 			// Parse input file
 			if r.ParseMultipartForm(32<<20) == nil {
 				if input, _, err := r.FormFile("file"); err == nil {
@@ -54,6 +60,13 @@ func DeleteMiddleware(next http.Handler) http.Handler {
 		if r.Method == http.MethodDelete && !strings.HasSuffix(r.URL.Path, "/") {
 			LogRequest(r)
 
+			// Check for authorization
+			if !IsAuthorized(r) {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+
+			// Delete file if exists, otherwise write a not found error
 			destFilepath := filepath.Join(basePath, r.URL.Path)
 			if _, err := os.Stat(destFilepath); err == nil {
 				if os.Remove(destFilepath) == nil {

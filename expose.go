@@ -92,17 +92,21 @@ func generateDirectoryDetails(directory string) (string, error) {
 
 func ExposeMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		directory := extractExposeDirectory(r.URL.Path)
-		if directory != nil && isDirectoryExposed(*directory) {
-			if details, err := generateDirectoryDetails(*directory); err == nil {
-				w.Header().Set("content-type", "application/json; charset=utf-8")
-				w.Write([]byte(details))
-				LogRequest(r)
-			} else {
-				panic(err)
+		// Expose middleware is only accessible when authorized
+		if IsAuthorized(r) {
+			directory := extractExposeDirectory(r.URL.Path)
+			if directory != nil && isDirectoryExposed(*directory) {
+				if details, err := generateDirectoryDetails(*directory); err == nil {
+					w.Header().Set("content-type", "application/json; charset=utf-8")
+					w.Write([]byte(details))
+					LogRequest(r)
+					return
+				} else {
+					panic(err)
+				}
 			}
-		} else {
-			next.ServeHTTP(w, r)
 		}
+
+		next.ServeHTTP(w, r)
 	})
 }

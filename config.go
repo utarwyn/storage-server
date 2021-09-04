@@ -15,6 +15,7 @@ var (
 	portPtr       = 8043
 	basePath      = "/svr/http"
 	pathPrefix    = "/"
+	clientSecret  = ""
 	enableLogging = false
 	exposeDirList []string
 )
@@ -46,6 +47,7 @@ func Configure() {
 	var exposeDirString string
 	flag.IntVar(&portPtr, "port", LookupEnvOrInt("PORT", portPtr), "listening port")
 	flag.StringVar(&basePath, "base-path", LookupEnvOrString("BASE_PATH", basePath), "directory where all files are stored")
+	flag.StringVar(&clientSecret, "client-secret", LookupEnvOrString("CLIENT_SECRET", clientSecret), "secret key usable to access privileged routes")
 	flag.BoolVar(&enableLogging, "enable-logging", LookupEnvOrBool("ENABLE_LOGGING", enableLogging), "enable log request")
 	flag.StringVar(&exposeDirString, "expose-directories", LookupEnvOrString("EXPOSE_DIRECTORIES", ""), "list of directories to expose")
 	flag.Parse()
