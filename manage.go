@@ -14,7 +14,7 @@ import (
 
 func UploadMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "PUT" && !strings.HasSuffix(r.URL.Path, "/") {
+		if r.Method == http.MethodPut && !strings.HasSuffix(r.URL.Path, "/") {
 			LogRequest(r)
 
 			// Parse input file
@@ -30,7 +30,7 @@ func UploadMiddleware(next http.Handler) http.Handler {
 					if dest, err := os.OpenFile(destFilepath, os.O_WRONLY|os.O_CREATE, os.ModePerm); err == nil {
 						defer dest.Close()
 						if _, err := io.Copy(dest, input); err == nil {
-							w.WriteHeader(201)
+							w.WriteHeader(http.StatusNoContent)
 						} else {
 							panic(err)
 						}
@@ -38,10 +38,33 @@ func UploadMiddleware(next http.Handler) http.Handler {
 						panic(err)
 					}
 				} else {
-					w.WriteHeader(400)
+					w.WriteHeader(http.StatusBadRequest)
 				}
 			} else {
-				w.WriteHeader(400)
+				w.WriteHeader(http.StatusBadRequest)
+			}
+		} else {
+			next.ServeHTTP(w, r)
+		}
+	})
+}
+
+func DeleteMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodDelete && !strings.HasSuffix(r.URL.Path, "/") {
+			LogRequest(r)
+
+			destFilepath := filepath.Join(basePath, r.URL.Path)
+			if _, err := os.Stat(destFilepath); err == nil {
+				if os.Remove(destFilepath) == nil {
+					w.WriteHeader(http.StatusNoContent)
+				} else {
+					panic(err)
+				}
+			} else if os.IsNotExist(err) {
+				w.WriteHeader(http.StatusNotFound)
+			} else {
+				panic(err)
 			}
 		} else {
 			next.ServeHTTP(w, r)

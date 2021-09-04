@@ -50,6 +50,7 @@ func main() {
 
 	// Middlewares
 	handler = UploadMiddleware(handler)
+	handler = DeleteMiddleware(handler)
 	handler = ExposeMiddleware(handler)
 	handler = GzipMiddleware(handler)
 

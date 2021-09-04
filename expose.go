@@ -9,7 +9,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -100,8 +99,7 @@ func ExposeMiddleware(next http.Handler) http.Handler {
 				w.Write([]byte(details))
 				LogRequest(r)
 			} else {
-				log.Printf("error when generating directory details: %v", err)
-				w.WriteHeader(500)
+				panic(err)
 			}
 		} else {
 			next.ServeHTTP(w, r)
