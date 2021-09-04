@@ -11,6 +11,12 @@ import (
 	"strings"
 )
 
+func LogRequest(r *http.Request) {
+	if enableLogging {
+		log.Println(r.Method, r.URL.Path)
+	}
+}
+
 func handleRequest(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// forward to https if still using http
@@ -28,10 +34,7 @@ func handleRequest(h http.Handler) http.Handler {
 			return
 		}
 
-		if enableLogging {
-			log.Println(r.Method, r.URL.Path)
-		}
-
+		LogRequest(r)
 		h.ServeHTTP(w, r)
 	})
 }
@@ -46,6 +49,7 @@ func main() {
 	handler := handleRequest(http.FileServer(fileSystem))
 
 	// Middlewares
+	handler = UploadMiddleware(handler)
 	handler = ExposeMiddleware(handler)
 	handler = GzipMiddleware(handler)
 

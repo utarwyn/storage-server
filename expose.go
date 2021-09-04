@@ -98,10 +98,7 @@ func ExposeMiddleware(next http.Handler) http.Handler {
 			if details, err := generateDirectoryDetails(*directory); err == nil {
 				w.Header().Set("content-type", "application/json; charset=utf-8")
 				w.Write([]byte(details))
-
-				if enableLogging {
-					log.Println(r.Method, r.URL.Path)
-				}
+				LogRequest(r)
 			} else {
 				log.Printf("error when generating directory details: %v", err)
 				w.WriteHeader(500)
