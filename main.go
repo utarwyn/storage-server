@@ -5,14 +5,13 @@
 package main
 
 import (
-	"compress/gzip"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
 )
 
-func handleReq(h http.Handler) http.Handler {
+func handleRequest(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// forward to https if still using http
 		if r.Header.Get("X-Forwarded-Proto") == "http" {
@@ -38,29 +37,17 @@ func handleReq(h http.Handler) http.Handler {
 }
 
 func main() {
-	configure()
+	Configure()
 
 	// Setup file system
 	var fileSystem http.FileSystem = http.Dir(basePath)
 
 	// Create file server object
-	handler := handleReq(http.FileServer(fileSystem))
+	handler := handleRequest(http.FileServer(fileSystem))
 
-	// GZIP handler
-	fileServer := handler
-	handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
-			fileServer.ServeHTTP(w, r)
-		} else {
-			w.Header().Set("Content-Encoding", "gzip")
-			gz := gzPool.Get().(*gzip.Writer)
-			defer gzPool.Put(gz)
-
-			gz.Reset(w)
-			defer gz.Close()
-			fileServer.ServeHTTP(&gzipResponseWriter{ResponseWriter: w, Writer: gz}, r)
-		}
-	})
+	// Middlewares
+	handler = ExposeMiddleware(handler)
+	handler = GzipMiddleware(handler)
 
 	// Start the server
 	http.Handle(pathPrefix, handler)

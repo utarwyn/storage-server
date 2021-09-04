@@ -8,6 +8,7 @@ import (
 	"flag"
 	"os"
 	"strconv"
+	"strings"
 )
 
 var (
@@ -15,6 +16,7 @@ var (
 	basePath      = "/svr/http"
 	pathPrefix    = "/"
 	enableLogging = false
+	exposeDirList []string
 )
 
 func LookupEnvOrString(key string, defaultVal string) string {
@@ -40,9 +42,13 @@ func LookupEnvOrBool(key string, defaultVal bool) bool {
 	return defaultVal
 }
 
-func configure() {
+func Configure() {
+	var exposeDirString string
 	flag.IntVar(&portPtr, "port", LookupEnvOrInt("PORT", portPtr), "listening port")
 	flag.StringVar(&basePath, "base-path", LookupEnvOrString("BASE_PATH", basePath), "directory where all files are stored")
 	flag.BoolVar(&enableLogging, "enable-logging", LookupEnvOrBool("ENABLE_LOGGING", enableLogging), "enable log request")
+	flag.StringVar(&exposeDirString, "expose-directories", LookupEnvOrString("EXPOSE_DIRECTORIES", ""), "list of directories to expose")
 	flag.Parse()
+
+	exposeDirList = strings.Split(exposeDirString, ";")
 }
