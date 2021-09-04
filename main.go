@@ -60,6 +60,7 @@ func main() {
 
 	// Log errors if found
 	port := ":" + strconv.FormatInt(int64(portPtr), 10)
+	log.Printf("Serving directory %v", basePath)
 	log.Printf("Listening at 0.0.0.0%v %v...", port, pathPrefix)
 	log.Fatalln(http.ListenAndServe(port, nil))
 }

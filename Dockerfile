@@ -20,5 +20,6 @@ FROM scratch
 WORKDIR /
 COPY --from=builder /go/src/companyofcube.fr/storage/bin/ .
 USER appuser
+EXPOSE 8043
 ENTRYPOINT ["/storage"]
 
