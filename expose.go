@@ -59,7 +59,8 @@ func getFileMD5Hash(filePath string) (string, error) {
 func generateDirectoryDetails(directory string) (string, error) {
 	var files []ExposedFile
 
-	walkErr := filepath.Walk(filepath.Join(basePath, directory),
+	walkDir := filepath.Join(basePath, directory)
+	walkErr := filepath.Walk(walkDir,
 		func(path string, info os.FileInfo, err error) error {
 			if err != nil {
 				return err
@@ -70,7 +71,7 @@ func generateDirectoryDetails(directory string) (string, error) {
 					return hashErr
 				}
 				files = append(files, ExposedFile{
-					Path:      strings.TrimLeft(strings.ReplaceAll(strings.TrimLeft(path, basePath), "\\", "/"), directory),
+					Path:      strings.TrimLeft(strings.ReplaceAll(strings.Replace(path, walkDir, "", 1), string(filepath.Separator), "/"), "/"),
 					MD5:       md5Hash,
 					Size:      info.Size(),
 					UpdatedAt: info.ModTime().UTC(),
@@ -98,9 +99,12 @@ func ExposeMiddleware(next http.Handler) http.Handler {
 			if directory != nil && isDirectoryExposed(*directory) {
 				if details, err := generateDirectoryDetails(*directory); err == nil {
 					w.Header().Set("content-type", "application/json; charset=utf-8")
-					w.Write([]byte(details))
-					LogRequest(r)
-					return
+					if _, err := w.Write([]byte(details)); err == nil {
+						LogRequest(r)
+						return
+					} else {
+						panic(err)
+					}
 				} else {
 					panic(err)
 				}
