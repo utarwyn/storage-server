@@ -17,6 +17,17 @@ func LogRequest(r *http.Request) {
 	}
 }
 
+func ApplyCorsPolicy(origin string, w http.ResponseWriter) {
+	if origin != "" && len(allowOriginList) > 0 {
+		for _, allowedOrigin := range allowOriginList {
+			if allowedOrigin == origin {
+				w.Header().Set("Access-Control-Allow-Origin", origin)
+				break
+			}
+		}
+	}
+}
+
 func handleRequest(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// forward to https if still using http
@@ -33,6 +44,9 @@ func handleRequest(h http.Handler) http.Handler {
 			http.NotFound(w, r)
 			return
 		}
+
+		// apply CORS policy based on origin header
+		ApplyCorsPolicy(r.Header.Get("Origin"), w)
 
 		LogRequest(r)
 		h.ServeHTTP(w, r)

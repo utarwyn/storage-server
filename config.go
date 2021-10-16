@@ -12,13 +12,14 @@ import (
 )
 
 var (
-	portPtr       = 8043
-	basePath      = "/svr/http"
-	pathPrefix    = "/"
-	clientSecret  = ""
-	enableLogging = false
-	cacheDirList  []string
-	exposeDirList []string
+	portPtr         = 8043
+	basePath        = "/svr/http"
+	pathPrefix      = "/"
+	clientSecret    = ""
+	enableLogging   = false
+	cacheDirList    []string
+	exposeDirList   []string
+	allowOriginList []string
 )
 
 func LookupEnvOrString(key string, defaultVal string) string {
@@ -47,6 +48,7 @@ func LookupEnvOrBool(key string, defaultVal bool) bool {
 func Configure() {
 	var cacheDirString string
 	var exposeDirString string
+	var allowOriginString string
 
 	flag.IntVar(&portPtr, "port", LookupEnvOrInt("PORT", portPtr), "listening port")
 	flag.StringVar(&basePath, "base-path", LookupEnvOrString("BASE_PATH", basePath), "directory where all files are stored")
@@ -54,8 +56,10 @@ func Configure() {
 	flag.BoolVar(&enableLogging, "enable-logging", LookupEnvOrBool("ENABLE_LOGGING", enableLogging), "enable log request")
 	flag.StringVar(&cacheDirString, "caching-directories", LookupEnvOrString("CACHING_DIRECTORIES", ""), "list of directories to cache")
 	flag.StringVar(&exposeDirString, "expose-directories", LookupEnvOrString("EXPOSE_DIRECTORIES", ""), "list of directories to expose")
+	flag.StringVar(&allowOriginString, "allow-origins", LookupEnvOrString("ALLOW_ORIGINS", ""), "list of origins to allow using CORS")
 	flag.Parse()
 
 	cacheDirList = strings.Split(cacheDirString, ";")
 	exposeDirList = strings.Split(exposeDirString, ";")
+	allowOriginList = strings.Split(allowOriginString, ";")
 }
