@@ -1,3 +1,3 @@
-module companyofcube.fr/storage
+module github.com/utarwyn/storage-server
 
 go 1.19

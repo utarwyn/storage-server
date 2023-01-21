@@ -1,7 +1,7 @@
 # stage 0
 FROM golang:alpine as builder
 
-WORKDIR /go/src/companyofcube.fr/storage
+WORKDIR /go/src/utarwyn.fr/storage-server
 COPY . .
 
 RUN mkdir ./bin && \
@@ -12,7 +12,7 @@ RUN mkdir ./bin && \
 # stage 1
 FROM scratch
 WORKDIR /
-COPY --from=builder /go/src/companyofcube.fr/storage/bin/ .
+COPY --from=builder /go/src/utarwyn.fr/storage-server/bin/ .
 EXPOSE 8043
 ENTRYPOINT ["/storage"]
 
