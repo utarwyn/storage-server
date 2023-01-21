@@ -1,18 +1,22 @@
 # stage 0
-FROM golang:alpine as builder
+FROM --platform=$BUILDPLATFORM golang:alpine as builder
 
-WORKDIR /go/src/utarwyn.fr/storage-server
+ARG TARGETPLATFORM
+
+WORKDIR /go/src/github.com/utarwyn/storage-server
 COPY . .
 
 RUN mkdir ./bin && \
     apk add build-base upx && \
-    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s" -tags netgo -installsuffix netgo -o ./bin/storage && \
-    upx -9 ./bin/storage
+    GOOS=$(echo $TARGETPLATFORM | cut -f1 -d/) && \
+    GOARCH=$(echo $TARGETPLATFORM | cut -f2 -d/) && \
+    GOARM=$(echo $TARGETPLATFORM | cut -f3 -d/ | sed "s/v//" ) && \
+    CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} GOARM=${GOARM} go build ${BUILD_ARGS} -ldflags="-s" -tags netgo -installsuffix netgo -o ./bin/storage-server && \
+    upx -9 ./bin/storage-server
 
 # stage 1
 FROM scratch
 WORKDIR /
-COPY --from=builder /go/src/utarwyn.fr/storage-server/bin/ .
+COPY --from=builder /go/src/github.com/utarwyn/storage-server/bin/ .
 EXPOSE 8043
-ENTRYPOINT ["/storage"]
-
+ENTRYPOINT ["/storage-server"]
