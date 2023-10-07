@@ -1,3 +1,3 @@
 module github.com/utarwyn/storage-server
 
-go 1.20
+go 1.21
