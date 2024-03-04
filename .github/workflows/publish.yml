@@ -34,6 +34,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          platforms: linux/amd64,linux/arm64,linux/arm/v5,linux/arm/v6,linux/arm/v7,darwin/amd64,darwin/arm64,windows/amd64
+          platforms: linux/amd64,linux/arm64,linux/arm/v5,linux/arm/v6,linux/arm/v7,windows/amd64
           push: true
           tags: utarwyn/storage-server:latest,ghcr.io/utarwyn/storage-server:latest
