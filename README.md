@@ -1,22 +1,20 @@
-<h1 align="center">Storage Server</h1>
+<div align="center">
+  <h1>Storage Server</h1>
 
-<h4 align="center">
-Lightweight and production-ready service to serve your static files.
-<br>
-Inspired from <a href="https://github.com/PierreZ/goStatic">goStatic</a>.
-</h4>
-
-<p align="center">
-   <a href="https://hub.docker.com/r/utarwyn/storage-server">
-      <img src="https://img.shields.io/docker/pulls/utarwyn/storage-server.svg" alt="Docker Pulls">
-   </a>
-   <a href="https://github.com/utarwyn/storage-server/actions/workflows/publish.yml">
-      <img src="https://img.shields.io/github/actions/workflow/status/utarwyn/storage-server/publish.yml?label=docker%20build" alt="Docker Build status">
-   </a>
-   <a href="https://github.com/utarwyn/storage-server/blob/main/LICENSE">
-      <img src="https://img.shields.io/github/license/utarwyn/storage-server" alt="License">
-   </a>
-</p>
+  <p>
+    <strong>
+      Lightweight and production-ready service to serve your static files.
+      <br>
+      Inspired from <a href="https://github.com/PierreZ/goStatic">goStatic</a>.
+    </strong>
+  </p>
+   
+  <p>
+    <a href="https://hub.docker.com/r/utarwyn/storage-server"><img src="https://img.shields.io/docker/pulls/utarwyn/storage-server.svg" alt="Docker Pulls"></a>
+    <a href="https://github.com/utarwyn/storage-server/actions/workflows/publish.yml"><img src="https://img.shields.io/github/actions/workflow/status/utarwyn/storage-server/publish.yml?label=docker%20build" alt="Docker Build status"></a>
+    <a href="https://github.com/utarwyn/storage-server/blob/main/LICENSE"><img src="https://img.shields.io/github/license/utarwyn/storage-server" alt="License"></a>
+  </p>
+</div>
 
 "Storage Server" is a **self-hosted service** to serve your files for everyone. This package is intended to be
 as light as possible, without dependency and very simple. It includes **key features** we can expect from a web
