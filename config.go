@@ -13,7 +13,7 @@ import (
 
 var (
 	portPtr         = 8043
-	basePath        = "/svr/http"
+	basePath        = "/srv/http"
 	pathPrefix      = "/"
 	clientSecret    = ""
 	enableLogging   = false
