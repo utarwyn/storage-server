@@ -28,6 +28,17 @@ func ApplyCorsPolicy(origin string, w http.ResponseWriter) {
 	}
 }
 
+func HealthcheckMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if enableHealthcheck && r.URL.Path == "/healthcheck" {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("OK"))
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
 func handleRequest(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// forward to https if still using http
@@ -63,6 +74,7 @@ func main() {
 	handler := handleRequest(http.FileServer(fileSystem))
 
 	// Middlewares
+	handler = HealthcheckMiddleware(handler)
 	handler = UploadMiddleware(handler)
 	handler = DeleteMiddleware(handler)
 	handler = ExposeMiddleware(handler)

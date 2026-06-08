@@ -12,14 +12,15 @@ import (
 )
 
 var (
-	portPtr         = 8043
-	basePath        = "/srv/http"
-	pathPrefix      = "/"
-	clientSecret    = ""
-	enableLogging   = false
-	cacheDirList    []string
-	exposeDirList   []string
-	allowOriginList []string
+	portPtr           = 8043
+	basePath          = "/srv/http"
+	pathPrefix        = "/"
+	clientSecret      = ""
+	enableLogging     = false
+	enableHealthcheck = false
+	cacheDirList      []string
+	exposeDirList     []string
+	allowOriginList   []string
 )
 
 func LookupEnvOrString(key string, defaultVal string) string {
@@ -54,6 +55,7 @@ func Configure() {
 	flag.StringVar(&basePath, "base-path", LookupEnvOrString("BASE_PATH", basePath), "directory where all files are stored")
 	flag.StringVar(&clientSecret, "client-secret", LookupEnvOrString("CLIENT_SECRET", clientSecret), "secret key used to access privileged routes")
 	flag.BoolVar(&enableLogging, "enable-logging", LookupEnvOrBool("ENABLE_LOGGING", enableLogging), "enable log request")
+	flag.BoolVar(&enableHealthcheck, "enable-healthcheck", LookupEnvOrBool("ENABLE_HEALTHCHECK", enableHealthcheck), "enable healthcheck route at /healthcheck")
 	flag.StringVar(&cacheDirString, "caching-directories", LookupEnvOrString("CACHING_DIRECTORIES", ""), "list of directories to cache")
 	flag.StringVar(&exposeDirString, "expose-directories", LookupEnvOrString("EXPOSE_DIRECTORIES", ""), "list of directories to expose")
 	flag.StringVar(&allowOriginString, "allow-origins", LookupEnvOrString("ALLOW_ORIGINS", ""), "list of origins to allow using CORS")

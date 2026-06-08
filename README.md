@@ -22,9 +22,7 @@ service, like caching, compression, logging and security. All configurable with 
 
 You have a problem with the service or want to have a new feature? Feel free to open an issue.
 
-
-Key features
-------------
+## Key features
 
 - Serve your files with an embedded static web server
 - Upload/Delete files through protected HTTP routes
@@ -34,17 +32,14 @@ Key features
 - Light and efficient as possible
 - No dependency :tada:
 
-Installation
-------------
+## Installation
 
 This service is designed to be used as a Docker image. All major platforms are supported. \
 So, you have to use the image `utarwyn/storage-server`.
 
 You can also build the executable from source code, just like a normal Golang program.
 
-
-Usage
------
+## Usage
 
 Example on how to run it:
 
@@ -55,26 +50,24 @@ docker run -p 80:8080 -e PORT=8080 -v path/to/files:/srv/http utarwyn/storage-se
 Available options:
 
 | Command parameter   | Env variable        | Default   | Description                                  |
-|---------------------|---------------------|-----------|----------------------------------------------|
+| ------------------- | ------------------- | --------- | -------------------------------------------- |
 | port                | PORT                | 8043      | Listening port                               |
 | base-path           | BASE_PATH           | /srv/http | Directory where files are stored             |
 | client-secret       | CLIENT_SECRET       | -         | Secret key used to access privileged routes  |
 | enable-logging      | ENABLE_LOGGING      | false     | Enable log request                           |
+| enable-healthcheck  | ENABLE_HEALTHCHECK  | false     | Enable /healthcheck route                    |
 | caching-directories | CACHING_DIRECTORIES | -         | List of directories to cache                 |
 | expose-directories  | EXPOSE_DIRECTORIES  | -         | List of directories to expose as a json file |
 | allow-origins       | ALLOW_ORIGINS       | -         | List of origins to allow using CORS policy   |
 
-License
--------
+## License
 
 "Storage Server" is open-sourced software licensed under the [MIT license][1].
 
 ---
+
 > GitHub [@utarwyn][2] &nbsp;&middot;&nbsp; Twitter [@Utarwyn][3]
 
-
 [1]: https://github.com/utarwyn/storage-server/blob/main/LICENSE
-
 [2]: https://github.com/utarwyn
-
 [3]: https://twitter.com/Utarwyn
