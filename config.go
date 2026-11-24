@@ -6,6 +6,7 @@ package main
 
 import (
 	"flag"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -18,6 +19,7 @@ var (
 	clientSecret      = ""
 	enableLogging     = false
 	enableHealthcheck = false
+	fileHashList      []string
 	cacheDirList      []string
 	exposeDirList     []string
 	allowOriginList   []string
@@ -46,10 +48,26 @@ func LookupEnvOrBool(key string, defaultVal bool) bool {
 	return defaultVal
 }
 
+func parseFileHashList(raw string) []string {
+	var list []string
+	for _, name := range strings.Split(raw, ";") {
+		name = strings.ToLower(strings.TrimSpace(name))
+		if name == "" {
+			continue
+		}
+		if name != "md5" && name != "sha256" {
+			log.Fatalf("invalid file hash %q: must be md5 or sha256", name)
+		}
+		list = append(list, name)
+	}
+	return list
+}
+
 func Configure() {
 	var cacheDirString string
 	var exposeDirString string
 	var allowOriginString string
+	var fileHashString string
 
 	flag.IntVar(&portPtr, "port", LookupEnvOrInt("PORT", portPtr), "listening port")
 	flag.StringVar(&basePath, "base-path", LookupEnvOrString("BASE_PATH", basePath), "directory where all files are stored")
@@ -59,8 +77,10 @@ func Configure() {
 	flag.StringVar(&cacheDirString, "caching-directories", LookupEnvOrString("CACHING_DIRECTORIES", ""), "list of directories to cache")
 	flag.StringVar(&exposeDirString, "expose-directories", LookupEnvOrString("EXPOSE_DIRECTORIES", ""), "list of directories to expose")
 	flag.StringVar(&allowOriginString, "allow-origins", LookupEnvOrString("ALLOW_ORIGINS", ""), "list of origins to allow using CORS")
+	flag.StringVar(&fileHashString, "file-hashes", LookupEnvOrString("FILE_HASHES", "md5"), "list of hash types to expose for files (md5 is deprecated and will be removed in the future, sha256)")
 	flag.Parse()
 
+	fileHashList = parseFileHashList(fileHashString)
 	cacheDirList = strings.Split(cacheDirString, ";")
 	exposeDirList = strings.Split(exposeDirString, ";")
 	allowOriginList = strings.Split(allowOriginString, ";")

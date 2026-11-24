@@ -6,8 +6,10 @@ package main
 
 import (
 	"crypto/md5"
+	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"hash"
 	"io"
 	"net/http"
 	"os"
@@ -18,7 +20,8 @@ import (
 
 type ExposedFile struct {
 	Path      string    `json:"path"`
-	MD5       string    `json:"md5"`
+	MD5       string    `json:"md5,omitempty"`
+	SHA256    string    `json:"sha256,omitempty"`
 	Size      int64     `json:"size"`
 	UpdatedAt time.Time `json:"updatedAt"`
 }
@@ -40,20 +43,40 @@ func isDirectoryExposed(directory string) bool {
 	return false
 }
 
-func getFileMD5Hash(filePath string) (string, error) {
-	var md5Ptr string
+// computeFileHashes reads the file once and returns hex digests by hash name.
+func computeFileHashes(filePath string, names []string) (map[string]string, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
-		return md5Ptr, err
+		return nil, err
 	}
 	defer file.Close()
-	hash := md5.New()
-	if _, err := io.Copy(hash, file); err != nil {
-		return md5Ptr, err
+
+	hashes := make(map[string]hash.Hash, len(names))
+	writers := make([]io.Writer, 0, len(names))
+	for _, name := range names {
+		var h hash.Hash
+		switch name {
+		case "md5":
+			h = md5.New()
+		case "sha256":
+			h = sha256.New()
+		default:
+			continue
+		}
+		hashes[name] = h
+		writers = append(writers, h)
 	}
-	hashInBytes := hash.Sum(nil)[:16]
-	md5Ptr = hex.EncodeToString(hashInBytes)
-	return md5Ptr, nil
+	if len(writers) > 0 {
+		if _, err := io.Copy(io.MultiWriter(writers...), file); err != nil {
+			return nil, err
+		}
+	}
+
+	result := make(map[string]string, len(hashes))
+	for name, h := range hashes {
+		result[name] = hex.EncodeToString(h.Sum(nil))
+	}
+	return result, nil
 }
 
 func generateDirectoryDetails(directory string) (string, error) {
@@ -66,16 +89,18 @@ func generateDirectoryDetails(directory string) (string, error) {
 				return err
 			}
 			if !info.IsDir() {
-				md5Hash, hashErr := getFileMD5Hash(path)
+				file := ExposedFile{
+					Path:      strings.TrimLeft(strings.ReplaceAll(strings.Replace(path, walkDir, "", 1), string(filepath.Separator), "/"), "/"),
+					Size:      info.Size(),
+					UpdatedAt: info.ModTime().UTC(),
+				}
+				hashes, hashErr := computeFileHashes(path, fileHashList)
 				if hashErr != nil {
 					return hashErr
 				}
-				files = append(files, ExposedFile{
-					Path:      strings.TrimLeft(strings.ReplaceAll(strings.Replace(path, walkDir, "", 1), string(filepath.Separator), "/"), "/"),
-					MD5:       md5Hash,
-					Size:      info.Size(),
-					UpdatedAt: info.ModTime().UTC(),
-				})
+				file.MD5 = hashes["md5"]
+				file.SHA256 = hashes["sha256"]
+				files = append(files, file)
 			}
 			return nil
 		})

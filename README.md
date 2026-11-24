@@ -59,6 +59,7 @@ Available options:
 | caching-directories | CACHING_DIRECTORIES | -         | List of directories to cache                 |
 | expose-directories  | EXPOSE_DIRECTORIES  | -         | List of directories to expose as a json file |
 | allow-origins       | ALLOW_ORIGINS       | -         | List of origins to allow using CORS policy   |
+| file-hashes         | FILE_HASHES         | md5       | List of hashes to expose: `md5` (deprecated, will be removed), `sha256` |
 
 ## License
 
